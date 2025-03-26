@@ -4,6 +4,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$$;
 import static com.codeborne.selenide.Selenide.open;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,6 +25,10 @@ public class MoneyTransferTest {
         DataHelper.AuthInfo authInfo = DataHelper.getAuthInfo();
         VerificationPage verificationPage = loginPage.validLogin(authInfo);
         dashboardPage = verificationPage.validVerify(DataHelper.getVerificationCodeFor());
+
+        // Явно ждём появления обеих карт "0001" и "0002"
+        $$(".list__item").findBy(text("0001")).shouldBe(visible, Duration.ofSeconds(10));
+        $$(".list__item").findBy(text("0002")).shouldBe(visible, Duration.ofSeconds(10));
 
         // Сохраняем исходные балансы
         initialFirstBalance = dashboardPage.getCardBalance("0001");
