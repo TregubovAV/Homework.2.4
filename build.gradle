@@ -23,6 +23,8 @@ dependencies {
     // Lombok для тестовых источников – обновленная версия
     testCompileOnly 'org.projectlombok:lombok:1.18.28'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+    
+    testImplementation 'org.slf4j:slf4j-simple:2.0.9'
 }
 
 test {

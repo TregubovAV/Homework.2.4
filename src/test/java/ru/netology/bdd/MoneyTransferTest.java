@@ -24,6 +24,7 @@ public class MoneyTransferTest {
         // Сохраняем исходные балансы
         initialFirstBalance = dashboardPage.getCardBalance("0001");
         initialSecondBalance = dashboardPage.getCardBalance("0002");
+        System.out.println("Initial second card balance: " + initialSecondBalance);
     }
 
     @AfterEach
@@ -31,6 +32,7 @@ public class MoneyTransferTest {
         // После каждого теста проверяем, изменились ли балансы и возвращаем их в исходное состояние, если нужно
         int currentFirst = dashboardPage.getCardBalance("0001");
         int currentSecond = dashboardPage.getCardBalance("0002");
+        System.out.println("Current second card balance: " + currentSecond);
 
         // Если балансы не совпадают с исходными, выполняем компенсирующий перевод
         int diff = currentFirst - initialFirstBalance;
