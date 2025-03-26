@@ -2,6 +2,12 @@ plugins {
     id 'java'
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -12,16 +18,14 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
     
     // Selenide
-    testImplementation 'com.codeborne:selenide:6.14.2'
+    testImplementation 'com.codeborne:selenide:6.17.2'
     
-    // Дополнительно (опционально) Lombok, Allure и т.д.
-    // testImplementation 'io.qameta.allure:allure-selenide:2.17.3'
-    // annotationProcessor 'org.projectlombok:lombok:1.18.24'
-    // compileOnly 'org.projectlombok:lombok:1.18.24'
+    // Lombok для тестовых источников – обновленная версия
+    testCompileOnly 'org.projectlombok:lombok:1.18.28'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
 }
 
 test {
     useJUnitPlatform()
-    // Параметр headless для Selenide:
     systemProperty "selenide.headless", "true"
 }
