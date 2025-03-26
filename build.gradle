@@ -32,3 +32,11 @@ test {
     useJUnitPlatform()
     systemProperty "selenide.headless", "true"
 }
+
+sourceSets {
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
+}
