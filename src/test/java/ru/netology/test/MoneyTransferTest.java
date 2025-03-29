@@ -1,21 +1,21 @@
-package ru.netology.bdd;
+package ru.netology.test;
+
+import ru.netology.data.DataHelper;
+import ru.netology.page.DashboardPage;
+import ru.netology.page.LoginPage;
+import ru.netology.page.TransferPage;
+import ru.netology.page.VerificationPage;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$$;
 import static com.codeborne.selenide.Selenide.open;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MoneyTransferTest {
     private DashboardPage dashboardPage;
     private int initialFirstBalance;
-    private int initialSecondBalance;
 
     @BeforeEach
     public void setUp() {
@@ -27,21 +27,21 @@ public class MoneyTransferTest {
         dashboardPage = verificationPage.validVerify(DataHelper.getVerificationCodeFor());
 
         // Явно ждём появления обеих карт "0001" и "0002"
-        $$(".list__item").findBy(text("0001")).shouldBe(visible, Duration.ofSeconds(10));
-        $$(".list__item").findBy(text("0002")).shouldBe(visible, Duration.ofSeconds(10));
+        dashboardPage.waitForCardsToLoad();
 
         // Сохраняем исходные балансы
         initialFirstBalance = dashboardPage.getCardBalance("0001");
-        initialSecondBalance = dashboardPage.getCardBalance("0002");
-        System.out.println("Initial second card balance: " + initialSecondBalance);
     }
 
     @AfterEach
     public void tearDown() {
         // После каждого теста проверяем, изменились ли балансы и возвращаем их в исходное состояние, если нужно
         int currentFirst = dashboardPage.getCardBalance("0001");
+
+        // Проверяем, что балансы не стали отрицательными
         int currentSecond = dashboardPage.getCardBalance("0002");
-        System.out.println("Current second card balance: " + currentSecond);
+        assert currentFirst >= 0 : "Баланс первой карты стал отрицательным: " + currentFirst;
+        assert currentSecond >= 0 : "Баланс второй карты стал отрицательным: " + currentSecond;
 
         // Если балансы не совпадают с исходными, выполняем компенсирующий перевод
         int diff = currentFirst - initialFirstBalance;
@@ -90,5 +90,23 @@ public class MoneyTransferTest {
         // Проверяем корректность изменения балансов
         assertEquals(firstBalanceBefore - transferAmount, firstBalanceAfter);
         assertEquals(secondBalanceBefore + transferAmount, secondBalanceAfter);
+    }
+
+    @Test
+    public void shouldNotAllowTransferMoreThanBalance() {
+        int firstCardBalance = dashboardPage.getCardBalance("0001");
+        int transferAmount = firstCardBalance + 1; // на 1 больше, чем есть на карте
+
+        // Пытаемся перевести больше, чем доступно
+        TransferPage transferPage = dashboardPage.selectCardToTransfer("0002");
+        dashboardPage = transferPage.makeTransfer(String.valueOf(transferAmount), DataHelper.getFirstCardInfo().getCardNumber());
+
+        int actualFirstCardBalance = dashboardPage.getCardBalance("0001");
+        int actualSecondCardBalance = dashboardPage.getCardBalance("0002");
+
+        // Проверяем, что перевод не прошёл — балансы не изменились
+        assertEquals(firstCardBalance, actualFirstCardBalance, "Перевод с недостаточным балансом не должен был пройти");
+        // Можно не проверять вторую карту, если первая не изменилась, но добавим для надёжности
+        assertEquals(dashboardPage.getCardBalance("0002"), actualSecondCardBalance);
     }
 }

@@ -1,4 +1,4 @@
-package ru.netology.bdd;
+package ru.netology.data;
 
 import lombok.Value;
 
