@@ -38,4 +38,9 @@ public class DataHelper {
     public static CardInfo getSecondCardInfo() {
         return new CardInfo("5559 0000 0000 0002");
     }
+
+    public static String getMaskedCardNumber(String fullCardNumber) {
+        String[] parts = fullCardNumber.split(" ");
+        return "**** **** **** " + parts[3];
+    }
 }

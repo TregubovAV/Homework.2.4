@@ -12,8 +12,8 @@ public class DashboardPage {
 
     private ElementsCollection cards = $$(".list__item");
 
-    public int getCardBalance(String cardNumberEnding) {
-        SelenideElement card = cards.findBy(text(cardNumberEnding));
+    public int getCardBalance(String maskedCardNumber) {
+        SelenideElement card = cards.findBy(text(maskedCardNumber));
         String text = card.text();
         return extractBalance(text);
     }
@@ -24,14 +24,15 @@ public class DashboardPage {
         return Integer.parseInt(balanceSubstring);
     }
 
-    public TransferPage selectCardToTransfer(String cardNumberEnding) {
-        SelenideElement card = cards.findBy(text(cardNumberEnding));
+    public TransferPage selectCardToTransfer(String maskedCardNumber) {
+        SelenideElement card = cards.findBy(text(maskedCardNumber));
         card.$("button").click();
         return new TransferPage();
     }
 
-    public void waitForCardsToLoad() {
-        cards.findBy(text("0001")).shouldBe(visible, Duration.ofSeconds(10));
-        cards.findBy(text("0002")).shouldBe(visible, Duration.ofSeconds(10));
+    public void waitForCardsToLoad(String... maskedCardNumbers) {
+        for (String maskedCardNumber : maskedCardNumbers) {
+            cards.findBy(text(maskedCardNumber)).shouldBe(visible, Duration.ofSeconds(10));
+        }
     }
 }
